@@ -30,7 +30,7 @@ def verify_password(username, password):
 def new_user():
     username = request.json.get('username')
     password = request.json.get('password')
-    if username in None or password is None:
+    if username is None or password is None:
         abort(400)
     if session.query(User).filter_by(username=username).first():
         abort(400)
