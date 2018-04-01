@@ -1,4 +1,4 @@
-from database_setup import Base, Bagel
+from database_setup import Base, Bagel, User
 from flask import Flask, jsonify, request, url_for, abort, g
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
@@ -18,7 +18,19 @@ app = Flask(__name__)
 #ADD @auth.verify_password here
 
 #ADD a /users route here
-
+@app.route('/users', methods=['POST'])
+def new_user():
+    username = request.json.get('username')
+    password = request.json.get('password')
+    if username in None or password is None:
+        abort(400)
+    if session.query(User).filter_by(username=username).first():
+        abort(400)
+    user = User(username=username)
+    user.hash_password(password)
+    session.add(user)
+    session.commit()
+    return jsonify({'user': user.username}), 201
 
 
 @app.route('/bagels', methods = ['GET','POST'])
