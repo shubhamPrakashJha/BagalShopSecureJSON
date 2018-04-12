@@ -20,6 +20,7 @@ class User(Base):
     def verify_password(self, password):
         return pwd_context.verify(password, self.password_hash)
 
+
 class Bagel(Base):
     __tablename__ = 'bagel'
     id = Column(Integer, primary_key=True)
