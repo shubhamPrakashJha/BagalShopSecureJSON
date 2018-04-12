@@ -18,11 +18,17 @@ app = Flask(__name__)
 #ADD @auth.verify_password here
 @auth.verify_password
 def verify_password(username, password):
+    print "Loking for User %s" %username
     user = session.query(User).filter_by(username=username).first()
-    if user is None or user.verify_password(password) is False:
+    if user is None:
+        print "User not found"
         return False
-    g.user = user
-    return True
+    elif user.verify_password(password) is False:
+        print "Unable to verify password"
+        return False
+    else:
+        g.user = user
+        return True
 
 
 #ADD a /users route here
@@ -31,9 +37,12 @@ def new_user():
     username = request.json.get('username')
     password = request.json.get('password')
     if username is None or password is None:
+        print "missing argument"
         abort(400)
     if session.query(User).filter_by(username=username).first():
-        abort(400)
+        print "existing user"
+        user = session.query(User).filter_by(username=username).first()
+        return jsonify({'message': 'username '+ user.username +' already exist'}), 200
     user = User(username=username)
     user.hash_password(password)
     session.add(user)
